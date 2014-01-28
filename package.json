@@ -1,6 +1,6 @@
 {
   "name": "string_decoder",
-  "version": "0.11.10",
+  "version": "0.11.10-1",
   "description": "The string_decoder module from Node core",
   "main": "index.js",
   "dependencies": {},
