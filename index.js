@@ -21,8 +21,17 @@
 
 var Buffer = require('buffer').Buffer;
 
+var isBufferEncoding = Buffer.isEncoding
+  || function(encoding) {
+       switch (encoding && encoding.toLowerCase()) {
+         case 'hex': case 'utf8': case 'utf-8': case 'ascii': case 'binary': case 'base64': case 'ucs2': case 'ucs-2': case 'utf16le': case 'utf-16le': case 'raw': return true;
+         default: return false;
+       }
+     }
+
+
 function assertEncoding(encoding) {
-  if (encoding && !Buffer.isEncoding(encoding)) {
+  if (encoding && !isBufferEncoding(encoding)) {
     throw new Error('Unknown encoding: ' + encoding);
   }
 }
