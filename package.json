@@ -2,13 +2,14 @@
   "name": "string_decoder",
   "version": "0.11.10-3",
   "description": "The string_decoder module from Node core",
-  "main": "index.js",
+  "main": "lib/string_decoder.js",
   "dependencies": {},
   "devDependencies": {
+    "babel-polyfill": "^6.23.0",
     "tap": "~0.4.8"
   },
   "scripts": {
-    "test": "tap test/simple/*.js"
+    "test": "tap test/parallel/*.js"
   },
   "repository": {
     "type": "git",

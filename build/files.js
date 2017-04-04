@@ -8,13 +8,16 @@
 
 module.exports['string_decoder.js'] = [
 
-    // pull in Bufer as a require
-    // add Buffer.isEncoding where missing
+    // we do not need internal/util anymore
     [
-        /^(\/\/ USE OR OTHER DEALINGS IN THE SOFTWARE\.)/m
-      ,   '$1\n\nvar Buffer = require(\'buffer\').Buffer;'
-        + '\n'
-        + '\nvar isBufferEncoding = Buffer.isEncoding'
+        /const internalUtil = require\('internal\/util'\);/
+      , ''
+    ]
+
+    // add Buffer.isEncoding where missing
+  , [
+        /const isEncoding = Buffer\[internalUtil.kIsEncodingSymbol\];/
+      ,   '\nvar isEncoding = Buffer.isEncoding'
         + '\n  || function(encoding) {'
         + '\n       switch (encoding && encoding.toLowerCase()) {'
         + '\n         case \'hex\': case \'utf8\': case \'utf-8\': case \'ascii\': case \'binary\': case \'base64\': case \'ucs2\': case \'ucs-2\': case \'utf16le\': case \'utf-16le\': case \'raw\': return true;'
@@ -23,14 +26,46 @@ module.exports['string_decoder.js'] = [
         + '\n     }'
         + '\n'
 
+        + '\nfunction _normalizeEncoding(enc) {'
+        + '\n   if (!enc) return \'utf8\';'
+        + '\n   var retried;'
+        + '\n   while (true) {'
+        + '\n     switch (enc) {'
+        + '\n       case \'utf8\':'
+        + '\n       case \'utf-8\':'
+        + '\n         return \'utf8\';'
+        + '\n       case \'ucs2\':'
+        + '\n       case \'ucs-2\':'
+        + '\n       case \'utf16le\':'
+        + '\n       case \'utf-16le\':'
+        + '\n         return \'utf16le\';'
+        + '\n       case \'latin1\':'
+        + '\n       case \'binary\':'
+        + '\n         return \'latin1\';'
+        + '\n       case \'base64\':'
+        + '\n       case \'ascii\':'
+        + '\n       case \'hex\':'
+        + '\n         return enc;'
+        + '\n       default:'
+        + '\n         if (retried) return; // undefined'
+        + '\n         enc = (\'\' + enc).toLowerCase();'
+        + '\n         retried = true;'
+        + '\n     }'
+        + '\n   }'
+        + '\n };'
     ]
+
 
     // use custom Buffer.isEncoding reference
   , [
         /Buffer\.isEncoding\(/g
-      , 'isBufferEncoding\('
+      , 'isEncoding\('
+    ]
+
+    // use _normalizeEncoding everywhere
+  , [
+        /internalUtil\.normalizeEncoding/g
+      , '_normalizeEncoding'
     ]
 
 ]
-
-module.exports['string_decoder.js'].out = 'index.js'
