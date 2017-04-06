@@ -4,6 +4,16 @@ module.exports.all = [
       , 'require(\'../../\')'
     ]
 
+  , [
+      /Buffer\.((?:alloc)|(?:allocUnsafe)|(?:from))/g,
+      'bufferShim.$1'
+    ]
+
+  , [
+      /^('use strict';)$/m,
+      '$1\nconst bufferShim = require(\'buffer-shims\');'
+    ]
+
 ]
 
 module.exports['common.js'] = [
@@ -42,3 +52,12 @@ module.exports['common.js'] = [
         + '  /*</replacement>*/\n\n$1'
     ]
 ]
+
+module.exports['test-string-decoder.js'] = [
+    // test removed because it is V8-version dependant.
+    [
+        /test\('utf-8', bufferShim.from\('EDA0B5EDB08D'.*\n.*\n/
+      , ''
+    ]
+]
+

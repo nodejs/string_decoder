@@ -1,4 +1,6 @@
 'use strict';
+
+var bufferShim = require('buffer-shims');
 // verify that the string decoder works getting 1 byte at a time,
 // the whole buffer at once, and that both match the .toString(enc)
 // result of the entire buffer.
@@ -9,7 +11,7 @@ var SD = require('../../').StringDecoder;
 var encodings = ['base64', 'hex', 'utf8', 'utf16le', 'ucs2'];
 
 var bufs = ['☃💩', 'asdf'].map(function (b) {
-  return Buffer.from(b);
+  return bufferShim.from(b);
 });
 
 // also test just arbitrary bytes from 0-15.
@@ -17,7 +19,7 @@ for (var i = 1; i <= 16; i++) {
   var bytes = '.'.repeat(i - 1).split('.').map(function (_, j) {
     return j + 0x78;
   });
-  bufs.push(Buffer.from(bytes));
+  bufs.push(bufferShim.from(bytes));
 }
 
 encodings.forEach(testEncoding);
