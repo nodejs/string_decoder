@@ -15,7 +15,7 @@ npm install --save string_decoder
 
 This package is a mirror of the string_decoder implementation in Node-core.
 
-Full documentation may be found on the [Node.js website](https://nodejs.org/dist/v7.8.0/docs/api/).
+Full documentation may be found on the [Node.js website](https://nodejs.org/dist/v7.0.0/docs/api/).
 
 As of version 1.0.0 **string_decoder** uses semantic versioning.
 

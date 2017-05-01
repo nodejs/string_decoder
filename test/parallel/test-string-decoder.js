@@ -1,6 +1,6 @@
 'use strict';
 
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 require('../common');
 var assert = require('assert');
 var inspect = require('util').inspect;
@@ -82,10 +82,6 @@ assert.strictEqual(decoder.write(bufferShim.from('F1', 'hex')), '');
 assert.strictEqual(decoder.write(bufferShim.from('41F2', 'hex')), '\ufffdA');
 assert.strictEqual(decoder.end(), '\ufffd');
 
-// Additional utf8Text test
-decoder = new StringDecoder('utf8');
-assert.strictEqual(decoder.text(bufferShim.from([0x41]), 2), '');
-
 // Additional UTF-16LE surrogate pair tests
 decoder = new StringDecoder('utf16le');
 assert.strictEqual(decoder.write(bufferShim.from('3DD8', 'hex')), '');
@@ -102,21 +98,13 @@ assert.strictEqual(decoder.write(bufferShim.from('3DD8', 'hex')), '');
 assert.strictEqual(decoder.write(bufferShim.from('4D', 'hex')), '');
 assert.strictEqual(decoder.end(), '\ud83d');
 
-assert.throws(function () {
-  new StringDecoder(1);
-}, /^Error: Unknown encoding: 1$/);
-
-assert.throws(function () {
-  new StringDecoder('test');
-}, /^Error: Unknown encoding: test$/);
-
 // test verifies that StringDecoder will correctly decode the given input
 // buffer with the given encoding to the expected output. It will attempt all
 // possible ways to write() the input buffer, see writeSequences(). The
 // singleSequence allows for easy debugging of a specific sequence which is
 // useful in case of test failures.
 function test(encoding, input, expected, singleSequence) {
-  var sequences = void 0;
+  var sequences;
   if (!singleSequence) {
     sequences = writeSequences(input.length);
   } else {
