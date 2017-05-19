@@ -1,6 +1,6 @@
 'use strict';
 
-var bufferShim = require('buffer-shims');
+var bufferShim = require('safe-buffer').Buffer;
 require('../common');
 var assert = require('assert');
 var inspect = require('util').inspect;

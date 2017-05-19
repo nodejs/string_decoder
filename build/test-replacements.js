@@ -11,7 +11,7 @@ module.exports.all = [
 
   , [
       /^('use strict';)$/m,
-      '$1\nconst bufferShim = require(\'buffer-shims\');'
+      '$1\nconst bufferShim = require(\'safe-buffer\').Buffer;'
     ]
 
 ]
@@ -60,4 +60,3 @@ module.exports['test-string-decoder.js'] = [
       , ''
     ]
 ]
-
