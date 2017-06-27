@@ -138,7 +138,7 @@ pump(
     // Grab the nodejs/node test/common.js
 
     processFile(
-        testsrcurl.replace(/parallel\/$/, 'common.js')
+        testsrcurl.replace(/parallel\/$/, 'common/index.js')
       , path.join(testourroot, '../common.js')
       , testReplace['common.js']
     )

@@ -56,7 +56,23 @@ module.exports['common.js'] = [
 module.exports['test-string-decoder.js'] = [
     // test removed because it is V8-version dependant.
     [
-        /test\('utf-8', bufferShim.from\('EDA0B5EDB08D'.*\n.*\n/
+        /test\('utf-8', bufferShim\.from\('EDA0B5EDB08D'.*\n.*\n/
+      , ''
+    ],
+  , [
+        /test\('utf-8', bufferShim\.from\('F0B841', 'hex'.*\n/
+      , ''
+    ]
+  , [
+        /test\('utf-8', bufferShim\.from\('CCE2B8B8', 'hex'.*\n/
+      , ''
+    ]
+  , [
+        /test\('utf-8', bufferShim\.from\('E2B8CCB8', 'hex'.*\n/
+      , ''
+    ]
+  , [
+        /assert\.strictEqual\(decoder\.end(), '\ufffd'\);\n/
       , ''
     ]
 ]
