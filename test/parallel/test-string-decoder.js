@@ -1,3 +1,24 @@
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 'use strict';
 
 var bufferShim = require('safe-buffer').Buffer;
@@ -9,8 +30,6 @@ var StringDecoder = require('../../').StringDecoder;
 // Test default encoding
 var decoder = new StringDecoder();
 assert.strictEqual(decoder.encoding, 'utf8');
-
-process.stdout.write('scanning ');
 
 // UTF-8
 test('utf-8', bufferShim.from('$', 'utf-8'), '$');
@@ -40,21 +59,19 @@ test('utf-8', bufferShim.from('C9B5A941', 'hex'), '\u0275\ufffdA');
 test('utf-8', bufferShim.from('E2', 'hex'), '\ufffd');
 test('utf-8', bufferShim.from('E241', 'hex'), '\ufffdA');
 test('utf-8', bufferShim.from('CCCCB8', 'hex'), '\ufffd\u0338');
-test('utf-8', bufferShim.from('F0B841', 'hex'), '\ufffd\ufffdA');
+test('utf-8', bufferShim.from('F0B841', 'hex'), '\ufffdA');
 test('utf-8', bufferShim.from('F1CCB8', 'hex'), '\ufffd\u0338');
 test('utf-8', bufferShim.from('F0FB00', 'hex'), '\ufffd\ufffd\0');
 test('utf-8', bufferShim.from('CCE2B8B8', 'hex'), '\ufffd\u2e38');
-test('utf-8', bufferShim.from('E2B8CCB8', 'hex'), '\ufffd\ufffd\u0338');
+test('utf-8', bufferShim.from('E2B8CCB8', 'hex'), '\ufffd\u0338');
 test('utf-8', bufferShim.from('E2FBCC01', 'hex'), '\ufffd\ufffd\ufffd\u0001');
 test('utf-8', bufferShim.from('CCB8CDB9', 'hex'), '\u0338\u0379');
-
+// CESU-8 of U+1D40D
 // UCS-2
 test('ucs2', bufferShim.from('ababc', 'ucs2'), 'ababc');
 
 // UTF-16LE
 test('utf16le', bufferShim.from('3DD84DDC', 'hex'), '\ud83d\udc4d'); // thumbs up
-
-console.log(' crayon!');
 
 // Additional UTF-8 tests
 decoder = new StringDecoder('utf8');
@@ -63,7 +80,7 @@ assert.strictEqual(decoder.end(), '\ufffd');
 
 decoder = new StringDecoder('utf8');
 assert.strictEqual(decoder.write(bufferShim.from('E18B', 'hex')), '');
-assert.strictEqual(decoder.end(), '\ufffd\ufffd');
+assert.strictEqual(decoder.end(), '\ufffd');
 
 decoder = new StringDecoder('utf8');
 assert.strictEqual(decoder.write(bufferShim.from('\ufffd')), '\ufffd');
@@ -122,6 +139,7 @@ function test(encoding, input, expected, singleSequence) {
   } else {
     sequences = [singleSequence];
   }
+  var hexNumberRE = /.{2}/g;
   sequences.forEach(function (sequence) {
     var decoder = new StringDecoder(encoding);
     var output = '';
@@ -129,9 +147,8 @@ function test(encoding, input, expected, singleSequence) {
       output += decoder.write(input.slice(write[0], write[1]));
     });
     output += decoder.end();
-    process.stdout.write('.');
     if (output !== expected) {
-      var message = 'Expected "' + unicodeEscape(expected) + '", ' + 'but got "' + unicodeEscape(output) + '"\n' + 'input: ' + input.toString('hex').match(/.{2}/g) + '\n' + 'Write sequence: ' + JSON.stringify(sequence) + '\n' + 'Full Decoder State: ' + inspect(decoder);
+      var message = 'Expected "' + unicodeEscape(expected) + '", ' + ('but got "' + unicodeEscape(output) + '"\n') + ('input: ' + input.toString('hex').match(hexNumberRE) + '\n') + ('Write sequence: ' + JSON.stringify(sequence) + '\n') + ('Full Decoder State: ' + inspect(decoder));
       assert.fail(output, expected, message);
     }
   });

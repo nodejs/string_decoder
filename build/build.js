@@ -16,7 +16,7 @@ const hyperquest  = require('hyperquest')
     , nodeVersionRegexString = '\\d+\\.\\d+\\.\\d+'
     , usageVersionRegex = RegExp('^' + nodeVersionRegexString + '$')
     , readmeVersionRegex =
-        RegExp('((?:Node-core )|(?:https\:\/\/nodejs\.org\/dist\/)v)' + nodeVersionRegexString, 'g')
+        RegExp('((?:(?:Node-core )|(?:https\:\/\/nodejs\.org\/dist\/))v)' + nodeVersionRegexString, 'g')
 
     , readmePath  = path.join(__dirname, '..', 'README.md')
     , files       = require('./files')
@@ -49,21 +49,37 @@ function processFile (inputLoc, out, replacements) {
       var arg2 = replacement[1]
       if (typeof arg2 === 'function')
         arg2 = arg2.bind(data)
+      if (arg2 === undefined) {
+        console.error('missing second arg for file', inputLoc, replacement)
+        throw new Error('missing second arg in replacement')
+      }
       data = data.replace(regexp, arg2)
     })
     if (inputLoc.slice(-3) === '.js') {
-      const transformed = babel.transform(data, {
-        plugins: [
-          'transform-es2015-parameters',
-          'transform-es2015-arrow-functions',
-          'transform-es2015-block-scoping',
-          'transform-es2015-template-literals',
-          'transform-es2015-shorthand-properties',
-          'transform-es2015-for-of',
-          'transform-es2015-destructuring'
-        ]
-      })
-      data = transformed.code
+      try {
+        const transformed = babel.transform(data, {
+          plugins: [
+            'transform-es2015-parameters',
+            'transform-es2015-arrow-functions',
+            'transform-es2015-block-scoping',
+            'transform-es2015-template-literals',
+            'transform-es2015-shorthand-properties',
+            'transform-es2015-for-of',
+            ['transform-es2015-classes', { loose: true }],
+            'transform-es2015-destructuring',
+            'transform-es2015-computed-properties',
+            'transform-es2015-spread'
+          ]
+        })
+        data = transformed.code
+      } catch (err) {
+        fs.writeFile(out + '.errored.js', data, encoding, function () {
+          console.log('Wrote errored', out)
+
+          throw err
+        })
+        return
+      }
     }
     fs.writeFile(out, data, encoding, function (err) {
       if (err) throw err
@@ -112,7 +128,6 @@ pump(
       throw err
     }
 
-
     //--------------------------------------------------------------------
     // Grab & process files in ../lib/
 
@@ -137,15 +152,23 @@ pump(
     //--------------------------------------------------------------------
     // Grab the nodejs/node test/common.js
 
-    processFile(
-        testsrcurl.replace(/parallel\/$/, 'common.js')
-      , path.join(testourroot, '../common.js')
-      , testReplace['common.js']
-    )
+  glob(path.join(src, 'test/common/*'), function (err, list) {
+      if (err) {
+        throw err
+      }
+
+      list.forEach(function (file) {
+        file = path.basename(file)
+        processFile(
+            path.join(testsrcurl.replace(/parallel\/$/, 'common/'), file)
+          , path.join(testourroot.replace('parallel', 'common'), file)
+          , testReplace['common.js']
+        )
+      })
+    })
 
     //--------------------------------------------------------------------
     // Update Node version in README
-
     processFile(readmePath, readmePath, [
       [readmeVersionRegex, "$1" + nodeVersion]
     ])
