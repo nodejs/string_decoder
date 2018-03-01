@@ -11,7 +11,7 @@
 npm install --save string_decoder
 ```
 
-***Node-core string_decoderstring_decoder for userland***
+***Node-core string_decoder for userland***
 
 This package is a mirror of the string_decoder implementation in Node-core.
 
