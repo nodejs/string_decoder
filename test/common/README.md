@@ -1,4 +1,20 @@
-require('babel-polyfill');# Node.js Core Test Common Modules
+/*<replacement>*/
+      require('babel-polyfill');
+      var util = require('util');
+      for (var i in util) exports[i] = util[i];
+      /*</replacement>*//*<replacement>*/
+if (!global.setImmediate) {
+  global.setImmediate = function setImmediate(fn) {
+    return setTimeout(fn.bind.apply(fn, arguments), 4);
+  };
+}
+if (!global.clearImmediate) {
+  global.clearImmediate = function clearImmediate(i) {
+  return clearTimeout(i);
+  };
+}
+/*</replacement>*/
+# Node.js Core Test Common Modules
 
 This directory contains modules used to test the Node.js implementation.
 
@@ -517,3 +533,9 @@ implementation with tests from
 [`common.hijackStdErr()`]: #hijackstderrlistener
 [`common.hijackStdOut()`]: #hijackstdoutlistener
 [internationalization]: https://github.com/nodejs/node/wiki/Intl
+
+function forEach (xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}

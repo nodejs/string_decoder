@@ -59,11 +59,8 @@ test('utf-8', bufferShim.from('C9B5A941', 'hex'), '\u0275\ufffdA');
 test('utf-8', bufferShim.from('E2', 'hex'), '\ufffd');
 test('utf-8', bufferShim.from('E241', 'hex'), '\ufffdA');
 test('utf-8', bufferShim.from('CCCCB8', 'hex'), '\ufffd\u0338');
-test('utf-8', bufferShim.from('F0B841', 'hex'), '\ufffdA');
 test('utf-8', bufferShim.from('F1CCB8', 'hex'), '\ufffd\u0338');
 test('utf-8', bufferShim.from('F0FB00', 'hex'), '\ufffd\ufffd\0');
-test('utf-8', bufferShim.from('CCE2B8B8', 'hex'), '\ufffd\u2e38');
-test('utf-8', bufferShim.from('E2B8CCB8', 'hex'), '\ufffd\u0338');
 test('utf-8', bufferShim.from('E2FBCC01', 'hex'), '\ufffd\ufffd\ufffd\u0001');
 test('utf-8', bufferShim.from('CCB8CDB9', 'hex'), '\u0338\u0379');
 // CESU-8 of U+1D40D

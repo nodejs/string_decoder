@@ -4,8 +4,34 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-require('babel-polyfill'); /* eslint-disable required-modules */
+/*<replacement>*/
+require('babel-polyfill');
+var util = require('util');
+for (var i in util) {
+  exports[i] = util[i];
+} /*</replacement>*/ /*<replacement>*/
+if (!global.setImmediate) {
+  global.setImmediate = function setImmediate(fn) {
+    return setTimeout(fn.bind.apply(fn, arguments), 4);
+  };
+}
+if (!global.clearImmediate) {
+  global.clearImmediate = function clearImmediate(i) {
+    return clearTimeout(i);
+  };
+}
+/*</replacement>*/
+/* eslint-disable required-modules */
 'use strict';
+
+/*<replacement>*/
+var objectKeys = objectKeys || function (obj) {
+  var keys = [];
+  for (var key in obj) {
+    keys.push(key);
+  }return keys;
+};
+/*</replacement>*/
 
 var _require = require('stream'),
     Duplex = _require.Duplex;
@@ -60,3 +86,9 @@ function makeDuplexPair() {
 }
 
 module.exports = makeDuplexPair;
+
+function forEach(xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}

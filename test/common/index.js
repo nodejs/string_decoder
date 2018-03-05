@@ -2,7 +2,24 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-require('babel-polyfill'); // Copyright Joyent, Inc. and other Node contributors.
+/*<replacement>*/
+require('babel-polyfill');
+var util = require('util');
+for (var i in util) {
+  exports[i] = util[i];
+} /*</replacement>*/ /*<replacement>*/
+if (!global.setImmediate) {
+  global.setImmediate = function setImmediate(fn) {
+    return setTimeout(fn.bind.apply(fn, arguments), 4);
+  };
+}
+if (!global.clearImmediate) {
+  global.clearImmediate = function clearImmediate(i) {
+    return clearTimeout(i);
+  };
+}
+/*</replacement>*/
+// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -25,6 +42,16 @@ require('babel-polyfill'); // Copyright Joyent, Inc. and other Node contributors
 
 /* eslint-disable required-modules, crypto-check */
 'use strict';
+
+/*<replacement>*/
+var objectKeys = objectKeys || function (obj) {
+  var keys = [];
+  for (var key in obj) {
+    keys.push(key);
+  }return keys;
+};
+/*</replacement>*/
+
 var path = require('path');
 var fs = require('fs');
 var assert = require('assert');
@@ -37,8 +64,13 @@ var _require = require('child_process'),
     spawnSync = _require.spawnSync;
 
 var stream = require('stream');
-var util = require('util');
-var Timer = process.binding('timer_wrap').Timer;
+
+/*<replacement>*/
+var util = require('core-util-is');
+util.inherits = require('inherits');
+/*</replacement>*/
+
+var Timer = { now: function () {} };
 
 var _require2 = require('./fixtures'),
     fixturesDir = _require2.fixturesDir;
@@ -63,19 +95,19 @@ exports.isOSX = process.platform === 'darwin';
 
 exports.enoughTestMem = os.totalmem() > 0x70000000; /* 1.75 Gb */
 var cpus = os.cpus();
-exports.enoughTestCpu = Array.isArray(cpus) && (cpus.length > 1 || cpus[0].speed > 999);
+/*exports.enoughTestCpu = Array.isArray(cpus) &&
+                        (cpus.length > 1 || cpus[0].speed > 999);*/
 
 exports.rootDir = exports.isWindows ? 'c:\\' : '/';
 exports.projectDir = path.resolve(__dirname, '..', '..');
 
-exports.buildType = process.config.target_defaults.default_configuration;
+//exports.buildType = process.config.target_defaults.default_configuration;
 
 // Always enable async_hooks checks in tests
 {
-  var async_wrap = process.binding('async_wrap');
-  var kCheck = async_wrap.constants.kCheck;
-
-  async_wrap.async_hook_fields[kCheck] += 1;
+  // const async_wrap = process.binding('async_wrap');
+  // const kCheck = async_wrap.constants.kCheck;
+  // async_wrap.async_hook_fields[kCheck] += 1;
 
   exports.revert_force_async_hooks_checks = function () {
     async_wrap.async_hook_fields[kCheck] -= 1;
@@ -107,26 +139,27 @@ if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {
     _queueDestroyAsyncId(id);
   };
 
-  require('async_hooks').createHook({
-    init: function (id, ty, tr, r) {
+  /*require('async_hooks').createHook({
+    init(id, ty, tr, r) {
       if (initHandles[id]) {
-        process._rawDebug('Is same resource: ' + (r === initHandles[id].resource));
-        process._rawDebug('Previous stack:\n' + initHandles[id].stack + '\n');
-        throw new Error('init called twice for same id (' + id + ')');
+        process._rawDebug(
+          `Is same resource: ${r === initHandles[id].resource}`);
+        process._rawDebug(`Previous stack:\n${initHandles[id].stack}\n`);
+        throw new Error(`init called twice for same id (${id})`);
       }
       initHandles[id] = { resource: r, stack: new Error().stack.substr(6) };
     },
-    before: function () {},
-    after: function () {},
-    destroy: function (id) {
+    before() { },
+    after() { },
+    destroy(id) {
       if (destroydIdsList[id] !== undefined) {
         process._rawDebug(destroydIdsList[id]);
         process._rawDebug();
-        throw new Error('destroy called for same id (' + id + ')');
+        throw new Error(`destroy called for same id (${id})`);
       }
       destroydIdsList[id] = new Error().stack;
-    }
-  }).enable();
+    },
+  }).enable();*/
 }
 
 function rimrafSync(p) {
@@ -154,7 +187,7 @@ function rmdirSync(p, originalEr) {
     if (e.code === 'ENOTDIR') throw originalEr;
     if (e.code === 'ENOTEMPTY' || e.code === 'EEXIST' || e.code === 'EPERM') {
       var enc = exports.isLinux ? 'buffer' : 'utf8';
-      fs.readdirSync(p, enc).forEach(function (f) {
+      forEach(fs.readdirSync(p, enc), function (f) {
         if (f instanceof Buffer) {
           var buf = Buffer.concat([Buffer.from(p), Buffer.from(path.sep), f]);
           rimrafSync(buf);
@@ -195,73 +228,83 @@ if (exports.isLinux) {
   'localhost'];
 }
 
-Object.defineProperty(exports, 'inFreeBSDJail', {
-  get: function () {
-    if (inFreeBSDJail !== null) return inFreeBSDJail;
+/*<replacement>*/if (!process.browser) {
+  Object.defineProperty(exports, 'inFreeBSDJail', {
+    get: function () {
+      if (inFreeBSDJail !== null) return inFreeBSDJail;
 
-    if (exports.isFreeBSD && execSync('sysctl -n security.jail.jailed').toString() === '1\n') {
-      inFreeBSDJail = true;
-    } else {
-      inFreeBSDJail = false;
-    }
-    return inFreeBSDJail;
-  }
-});
-
-Object.defineProperty(exports, 'localhostIPv4', {
-  get: function () {
-    if (localhostIPv4 !== null) return localhostIPv4;
-
-    if (exports.inFreeBSDJail) {
-      // Jailed network interfaces are a bit special - since we need to jump
-      // through loops, as well as this being an exception case, assume the
-      // user will provide this instead.
-      if (process.env.LOCALHOST) {
-        localhostIPv4 = process.env.LOCALHOST;
+      if (exports.isFreeBSD && execSync('sysctl -n security.jail.jailed').toString() === '1\n') {
+        inFreeBSDJail = true;
       } else {
-        console.error('Looks like we\'re in a FreeBSD Jail. ' + 'Please provide your default interface address ' + 'as LOCALHOST or expect some tests to fail.');
+        inFreeBSDJail = false;
       }
+      return inFreeBSDJail;
     }
+  });
+} /*</replacement>*/
 
-    if (localhostIPv4 === null) localhostIPv4 = '127.0.0.1';
+/*<replacement>*/if (!process.browser) {
+  Object.defineProperty(exports, 'localhostIPv4', {
+    get: function () {
+      if (localhostIPv4 !== null) return localhostIPv4;
 
-    return localhostIPv4;
-  }
-});
+      if (exports.inFreeBSDJail) {
+        // Jailed network interfaces are a bit special - since we need to jump
+        // through loops, as well as this being an exception case, assume the
+        // user will provide this instead.
+        if (process.env.LOCALHOST) {
+          localhostIPv4 = process.env.LOCALHOST;
+        } else {
+          console.error('Looks like we\'re in a FreeBSD Jail. ' + 'Please provide your default interface address ' + 'as LOCALHOST or expect some tests to fail.');
+        }
+      }
+
+      if (localhostIPv4 === null) localhostIPv4 = '127.0.0.1';
+
+      return localhostIPv4;
+    }
+  });
+} /*</replacement>*/
 
 // opensslCli defined lazily to reduce overhead of spawnSync
-Object.defineProperty(exports, 'opensslCli', { get: function () {
-    if (opensslCli !== null) return opensslCli;
+/*<replacement>*/if (!process.browser) {
+  Object.defineProperty(exports, 'opensslCli', { get: function () {
+      if (opensslCli !== null) return opensslCli;
 
-    if (process.config.variables.node_shared_openssl) {
-      // use external command
-      opensslCli = 'openssl';
-    } else {
-      // use command built from sources included in Node.js repository
-      opensslCli = path.join(path.dirname(process.execPath), 'openssl-cli');
+      if (process.config.variables.node_shared_openssl) {
+        // use external command
+        opensslCli = 'openssl';
+      } else {
+        // use command built from sources included in Node.js repository
+        opensslCli = path.join(path.dirname(process.execPath), 'openssl-cli');
+      }
+
+      if (exports.isWindows) opensslCli += '.exe';
+
+      var opensslCmd = spawnSync(opensslCli, ['version']);
+      if (opensslCmd.status !== 0 || opensslCmd.error !== undefined) {
+        // openssl command cannot be executed
+        opensslCli = false;
+      }
+      return opensslCli;
+    }, enumerable: true });
+} /*</replacement>*/
+
+/*<replacement>*/if (!process.browser) {
+  Object.defineProperty(exports, 'hasCrypto', {
+    get: function () {
+      return Boolean(process.versions.openssl);
     }
+  });
+} /*</replacement>*/
 
-    if (exports.isWindows) opensslCli += '.exe';
-
-    var opensslCmd = spawnSync(opensslCli, ['version']);
-    if (opensslCmd.status !== 0 || opensslCmd.error !== undefined) {
-      // openssl command cannot be executed
-      opensslCli = false;
+/*<replacement>*/if (!process.browser) {
+  Object.defineProperty(exports, 'hasFipsCrypto', {
+    get: function () {
+      return exports.hasCrypto && require('crypto').fips;
     }
-    return opensslCli;
-  }, enumerable: true });
-
-Object.defineProperty(exports, 'hasCrypto', {
-  get: function () {
-    return Boolean(process.versions.openssl);
-  }
-});
-
-Object.defineProperty(exports, 'hasFipsCrypto', {
-  get: function () {
-    return exports.hasCrypto && require('crypto').fips;
-  }
-});
+  });
+} /*</replacement>*/
 
 {
   var localRelative = path.relative(process.cwd(), exports.tmpDir + '/');
@@ -273,7 +316,7 @@ Object.defineProperty(exports, 'hasFipsCrypto', {
 {
   var iFaces = os.networkInterfaces();
   var re = exports.isWindows ? /Loopback Pseudo-Interface/ : /lo/;
-  exports.hasIPv6 = Object.keys(iFaces).some(function (name) {
+  exports.hasIPv6 = objectKeys(iFaces).some(function (name) {
     return re.test(name) && iFaces[name].some(function (info) {
       return info.family === 'IPv6';
     });
@@ -378,19 +421,21 @@ if (global.LTTNG_HTTP_SERVER_RESPONSE) {
   knownGlobals.push(LTTNG_NET_SERVER_CONNECTION);
 }
 
-if (global.ArrayBuffer) {
-  knownGlobals.push(ArrayBuffer);
-  knownGlobals.push(Int8Array);
-  knownGlobals.push(Uint8Array);
-  knownGlobals.push(Uint8ClampedArray);
-  knownGlobals.push(Int16Array);
-  knownGlobals.push(Uint16Array);
-  knownGlobals.push(Int32Array);
-  knownGlobals.push(Uint32Array);
-  knownGlobals.push(Float32Array);
-  knownGlobals.push(Float64Array);
-  knownGlobals.push(DataView);
-}
+/*<replacement>*/if (!process.browser) {
+  if (global.ArrayBuffer) {
+    knownGlobals.push(ArrayBuffer);
+    knownGlobals.push(Int8Array);
+    knownGlobals.push(Uint8Array);
+    knownGlobals.push(Uint8ClampedArray);
+    knownGlobals.push(Int16Array);
+    knownGlobals.push(Uint16Array);
+    knownGlobals.push(Int32Array);
+    knownGlobals.push(Uint32Array);
+    knownGlobals.push(Float32Array);
+    knownGlobals.push(Float64Array);
+    knownGlobals.push(DataView);
+  }
+} /*</replacement>*/
 
 // Harmony features.
 if (global.Proxy) {
@@ -471,7 +516,7 @@ function runCallChecks(exitCode) {
     }
   });
 
-  failed.forEach(function (context) {
+  forEach(failed, function (context) {
     console.log('Mismatched %s function calls. Expected %s, actual %d.', context.name, context.messageSegment, context.actual);
     console.log(context.stack.split('\n').slice(2).join('\n'));
   });
@@ -594,7 +639,7 @@ function ArrayStream() {
   this.run = function (data) {
     var _this = this;
 
-    data.forEach(function (line) {
+    forEach(data, function (line) {
       _this.emit('data', line + '\n');
     });
   };
@@ -678,7 +723,7 @@ function expectWarningByName(name, expected) {
 
 function expectWarningByMap(warningMap) {
   var catchWarning = {};
-  Object.keys(warningMap).forEach(function (name) {
+  forEach(objectKeys(warningMap), function (name) {
     var expected = warningMap[name];
     if (typeof expected === 'string') {
       expected = [expected];
@@ -701,17 +746,21 @@ exports.expectWarning = function (nameOrMap, expected) {
   }
 };
 
-Object.defineProperty(exports, 'hasIntl', {
-  get: function () {
-    return process.binding('config').hasIntl;
-  }
-});
+/*<replacement>*/if (!process.browser) {
+  Object.defineProperty(exports, 'hasIntl', {
+    get: function () {
+      return process.binding('config').hasIntl;
+    }
+  });
+} /*</replacement>*/
 
-Object.defineProperty(exports, 'hasSmallICU', {
-  get: function () {
-    return process.binding('config').hasSmallICU;
-  }
-});
+/*<replacement>*/if (!process.browser) {
+  Object.defineProperty(exports, 'hasSmallICU', {
+    get: function () {
+      return process.binding('config').hasSmallICU;
+    }
+  });
+} /*</replacement>*/
 
 // Useful for testing expected internal/error objects
 exports.expectsError = function expectsError(fn, settings, exact) {
@@ -741,7 +790,7 @@ exports.expectsError = function expectsError(fn, settings, exact) {
       assert.strictEqual(error.name, settings.name);
     }
     if (error.constructor.name === 'AssertionError') {
-      ['generatedMessage', 'actual', 'expected', 'operator'].forEach(function (key) {
+      forEach(['generatedMessage', 'actual', 'expected', 'operator'], function (key) {
         if (key in settings) {
           var actual = error[key];
           var expected = settings[key];
@@ -915,3 +964,24 @@ exports.fires = function fires(promise, error, timeoutMs) {
     return timeout.clear();
   }), timeout]);
 };
+
+function forEach(xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}
+
+if (!util._errnoException) {
+  var uv;
+  util._errnoException = function (err, syscall) {
+    if (util.isUndefined(uv)) try {
+      uv = process.binding('uv');
+    } catch (e) {}
+    var errname = uv ? uv.errname(err) : '';
+    var e = new Error(syscall + ' ' + errname);
+    e.code = errname;
+    e.errno = errname;
+    e.syscall = syscall;
+    return e;
+  };
+}

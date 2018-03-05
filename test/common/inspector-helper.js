@@ -1,6 +1,33 @@
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-require('babel-polyfill');'use strict';
+/*<replacement>*/
+require('babel-polyfill');
+var util = require('util');
+for (var i in util) {
+  exports[i] = util[i];
+} /*</replacement>*/ /*<replacement>*/
+if (!global.setImmediate) {
+  global.setImmediate = function setImmediate(fn) {
+    return setTimeout(fn.bind.apply(fn, arguments), 4);
+  };
+}
+if (!global.clearImmediate) {
+  global.clearImmediate = function clearImmediate(i) {
+    return clearTimeout(i);
+  };
+}
+/*</replacement>*/
+'use strict';
+
+/*<replacement>*/
+var objectKeys = objectKeys || function (obj) {
+  var keys = [];
+  for (var key in obj) {
+    keys.push(key);
+  }return keys;
+};
+/*</replacement>*/
+
 var common = require('../common');
 var assert = require('assert');
 var fs = require('fs');
@@ -131,8 +158,8 @@ function formatWSFrame(message) {
   wsHeaderBuf.writeUInt8(byte2, 1);
   wsHeaderBuf.writeUInt32BE(0x01020408, maskOffset);
 
-  for (var i = 0; i < messageBuf.length; i++) {
-    messageBuf[i] = messageBuf[i] ^ 1 << i % 4;
+  for (var _i = 0; _i < messageBuf.length; _i++) {
+    messageBuf[_i] = messageBuf[_i] ^ 1 << _i % 4;
   }return Buffer.concat([wsHeaderBuf.slice(0, maskOffset + 4), messageBuf]);
 }
 
@@ -290,7 +317,7 @@ var InspectorSession = function () {
     if ('Runtime.consoleAPICalled' === notification['method']) {
       var params = notification['params'];
       if (params['type'] === type) {
-        var i = 0;
+        var _i2 = 0;
         var _iteratorNormalCompletion2 = true;
         var _didIteratorError2 = false;
         var _iteratorError2 = undefined;
@@ -299,7 +326,7 @@ var InspectorSession = function () {
           for (var _iterator2 = params['args'][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
             var value = _step2.value;
 
-            if (value['value'] !== values[i++]) return false;
+            if (value['value'] !== values[_i2++]) return false;
           }
         } catch (err) {
           _didIteratorError2 = true;
@@ -316,7 +343,7 @@ var InspectorSession = function () {
           }
         }
 
-        return i === values.length;
+        return _i2 === values.length;
       }
     }
   };
@@ -486,3 +513,9 @@ module.exports = {
   readMainScriptSource: readMainScriptSource,
   NodeInstance: NodeInstance
 };
+
+function forEach(xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}

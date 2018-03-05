@@ -1,7 +1,33 @@
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-require('babel-polyfill'); /* eslint-disable required-modules */
+/*<replacement>*/
+require('babel-polyfill');
+var util = require('util');
+for (var i in util) {
+  exports[i] = util[i];
+} /*</replacement>*/ /*<replacement>*/
+if (!global.setImmediate) {
+  global.setImmediate = function setImmediate(fn) {
+    return setTimeout(fn.bind.apply(fn, arguments), 4);
+  };
+}
+if (!global.clearImmediate) {
+  global.clearImmediate = function clearImmediate(i) {
+    return clearTimeout(i);
+  };
+}
+/*</replacement>*/
+/* eslint-disable required-modules */
 'use strict';
+
+/*<replacement>*/
+var objectKeys = objectKeys || function (obj) {
+  var keys = [];
+  for (var key in obj) {
+    keys.push(key);
+  }return keys;
+};
+/*</replacement>*/
 
 // Naïve DNS parser/serializer.
 
@@ -76,7 +102,7 @@ function parseDNSPacket(buffer) {
           count = _step$value[1];
 
       parsed[sectionName] = [];
-      for (var i = 0; i < count; ++i) {
+      for (var _i = 0; _i < count; ++_i) {
         var _readDomainFromPacket2 = readDomainFromPacket(buffer, offset),
             nread = _readDomainFromPacket2.nread,
             domain = _readDomainFromPacket2.domain;
@@ -384,3 +410,9 @@ function writeDNSPacket(parsed) {
 }
 
 module.exports = { types: types, classes: classes, writeDNSPacket: writeDNSPacket, parseDNSPacket: parseDNSPacket };
+
+function forEach(xs, f) {
+  for (var i = 0, l = xs.length; i < l; i++) {
+    f(xs[i], i);
+  }
+}
