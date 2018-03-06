@@ -1,6 +1,6 @@
 # string_decoder
 
-***Node-core v7.0.0 string_decoder for userland***
+***Node-core v8.9.4 string_decoder for userland***
 
 
 [![NPM](https://nodei.co/npm/string_decoder.png?downloads=true&downloadRank=true)](https://nodei.co/npm/string_decoder/)
@@ -15,7 +15,7 @@ npm install --save string_decoder
 
 This package is a mirror of the string_decoder implementation in Node-core.
 
-Full documentation may be found on the [Node.js website](https://nodejs.org/dist/v7.8.0/docs/api/).
+Full documentation may be found on the [Node.js website](https://nodejs.org/dist/v8.9.4/docs/api/).
 
 As of version 1.0.0 **string_decoder** uses semantic versioning.
 

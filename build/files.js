@@ -15,8 +15,11 @@ module.exports['string_decoder.js'] = [
     ]
 
   , [
-        /const Buffer = require\('buffer'\).Buffer;/
-      , 'var Buffer = require(\'safe-buffer\').Buffer;\n'
+    /(?:var|const) (?:{ )Buffer(?: }) = require\('buffer'\)(?:\.Buffer)?;/,
+    `/*<replacement>*/
+  var Buffer = require('safe-buffer').Buffer;
+/*</replacement>*/
+`
     ]
 
     // add Buffer.isEncoding where missing
