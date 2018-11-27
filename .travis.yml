@@ -37,9 +37,13 @@ matrix:
       - TASK=test
       - NPM_LEGACY=true
   - node_js: 4
-    env: TASK=test
+    env:
+      - TASK=test
+      - NPM_LEGACY=true
   - node_js: 5
-    env: TASK=test
+    env:
+      - TASK=test
+      - NPM_LEGACY=true
   - node_js: 6
     env: TASK=test
   - node_js: 7
