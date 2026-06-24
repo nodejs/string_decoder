@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/nodejs/string_decoder.git"
+    "url": "git+https://github.com/nodejs/string_decoder.git"
   },
   "homepage": "https://github.com/nodejs/string_decoder",
   "keywords": [
