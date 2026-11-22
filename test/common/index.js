@@ -446,6 +446,19 @@ if (global.Symbol) {
   knownGlobals.push(Symbol);
 }
 
+// Globals introduced in later Node.js versions. Guard on presence so this
+// harness keeps working when run on newer releases.
+if (global.queueMicrotask) knownGlobals.push(queueMicrotask);
+if (global.structuredClone) knownGlobals.push(structuredClone);
+if (global.atob) knownGlobals.push(atob);
+if (global.btoa) knownGlobals.push(btoa);
+if (global.performance) knownGlobals.push(performance);
+if (global.fetch) knownGlobals.push(fetch);
+if (global.navigator) knownGlobals.push(navigator);
+if (global.crypto) knownGlobals.push(crypto);
+if (global.localStorage) knownGlobals.push(localStorage);
+if (global.sessionStorage) knownGlobals.push(sessionStorage);
+
 if (process.env.NODE_TEST_KNOWN_GLOBALS) {
   var knownFromEnv = process.env.NODE_TEST_KNOWN_GLOBALS.split(',');
   allowGlobals.apply(undefined, _toConsumableArray(knownFromEnv));
