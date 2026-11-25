@@ -123,7 +123,7 @@ module.exports['common.js'] = [
     , [
       /^/,
       `/*<replacement>*/
-      require('babel-polyfill');
+      require('core-js/stable');
       var util = require('util');
       for (var i in util) exports[i] = util[i];
       /*</replacement>*/`

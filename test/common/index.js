@@ -3,7 +3,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 /*<replacement>*/
-require('babel-polyfill');
+require('core-js/stable');
 var util = require('util');
 for (var i in util) {
   exports[i] = util[i];
@@ -458,6 +458,14 @@ if (global.navigator) knownGlobals.push(navigator);
 if (global.crypto) knownGlobals.push(crypto);
 if (global.localStorage) knownGlobals.push(localStorage);
 if (global.sessionStorage) knownGlobals.push(sessionStorage);
+
+// Web/browser globals that the core-js polyfill may install on older
+// runtimes. `self` and `globalThis` refer to the global object itself, so
+// they are covered by the `global` entry above, but the URL constructors
+// are not.
+if (global.self) knownGlobals.push(self);
+if (global.URL) knownGlobals.push(URL);
+if (global.URLSearchParams) knownGlobals.push(URLSearchParams);
 
 if (process.env.NODE_TEST_KNOWN_GLOBALS) {
   var knownFromEnv = process.env.NODE_TEST_KNOWN_GLOBALS.split(',');
