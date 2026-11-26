@@ -10,7 +10,7 @@
     "safe-buffer": "~5.2.0"
   },
   "devDependencies": {
-    "babel-polyfill": "^6.23.0",
+    "core-js": "^3.51.0",
     "core-util-is": "^1.0.2",
     "inherits": "^2.0.3",
     "tap": "~0.4.8"

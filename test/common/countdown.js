@@ -3,7 +3,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /*<replacement>*/
-require('babel-polyfill');
+require('core-js/stable');
 var util = require('util');
 for (var i in util) {
   exports[i] = util[i];
