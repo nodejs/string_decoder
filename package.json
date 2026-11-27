@@ -12,11 +12,10 @@
   "devDependencies": {
     "core-js": "^3.51.0",
     "core-util-is": "^1.0.2",
-    "inherits": "^2.0.3",
-    "tap": "~0.4.8"
+    "inherits": "^2.0.3"
   },
   "scripts": {
-    "test": "tap test/parallel/*.js && node test/verify-dependencies"
+    "test": "node test/run.js && node test/verify-dependencies"
   },
   "repository": {
     "type": "git",
